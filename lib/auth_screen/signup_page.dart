@@ -1,5 +1,6 @@
 import 'package:firebase_project/auth_screen/signin_page.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../custom_things/custom_text_feild/custom_text_feild.dart';
 import '../helper/firebase_helper.dart';
 
@@ -160,13 +161,15 @@ class _SignUpPageState extends State<SignUpPage> {
                 ElevatedButton(
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      FireBaseHelper().createUser(user_name: nameController.text, user_email: emailController.text,user_pass: passController.text,context: context);
+
+                      Provider.of<FireBaseHelper>(context,listen: false).createUser(user_name: nameController.text, user_email: emailController.text,user_pass: passController.text,context: context);
+                      //FireBaseHelper().createUser(user_name: nameController.text, user_email: emailController.text,user_pass: passController.text,context: context);
                       nameController.text='';
                       emailController.text='';
                       passController.text='';
                     }
                   },
-                  child: Text('SIGN Up'),
+                  child: (Provider.of<FireBaseHelper>(context).signUpLoading)?const CircularProgressIndicator(color: Colors.white,): const Text('SIGN UP'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0xFF006847),
                     shape: RoundedRectangleBorder(

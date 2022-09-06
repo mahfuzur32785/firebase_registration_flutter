@@ -1,5 +1,6 @@
 import 'package:firebase_project/auth_screen/signup_page.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../custom_things/custom_text_feild/custom_text_feild.dart';
 import '../helper/firebase_helper.dart';
 
@@ -122,11 +123,13 @@ class _SignInPageState extends State<SignInPage> {
                 ElevatedButton(
                   onPressed: () {
                     if(_formKey.currentState!.validate()){
-                      FireBaseHelper().userSignin(user_email: emailController.text, user_pass: passController.text, context: context);
+
+                      Provider.of<FireBaseHelper>(context,listen: false).userSignin(user_email: emailController.text, user_pass: passController.text, context: context);
+
+                      //FireBaseHelper().userSignin(user_email: emailController.text, user_pass: passController.text, context: context, );
                     }
                     //Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context)=>HomePage()), (route) => false);
                   },
-                  child: Text('SIGN IN'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0xFF006847),
                     shape: RoundedRectangleBorder(
@@ -135,6 +138,7 @@ class _SignInPageState extends State<SignInPage> {
                     fixedSize: Size(MediaQuery.of(context).size.width * 1,
                         MediaQuery.of(context).size.height * 0.06),
                   ),
+                  child: (Provider.of<FireBaseHelper>(context).signInLoading)?const CircularProgressIndicator(color: Colors.white,): const Text('SIGN IN'),
                 ),
                 SizedBox(
                   height: MediaQuery.of(context).size.height * 0.02,

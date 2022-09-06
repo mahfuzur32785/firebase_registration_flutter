@@ -8,31 +8,50 @@ import 'package:rflutter_alert/rflutter_alert.dart';
 import '../auth_screen/signin_page.dart';
 import '../custom_things/nav_bar/custom_btm_nav_bar.dart';
 
-class FireBaseHelper extends ChangeNotifier{
+class FireBaseHelper with ChangeNotifier{
+  bool signInLoading =false;
+  bool signUpLoading = false;
+  bool profileUpdateLoading = false;
 
   //FOR SIGNUP ++++++++++++++++++++++++++++++++
   Future<void> createUser({user_name, user_email, user_pass, context}) async {
+
+    signUpLoading =true;
+    notifyListeners();
     try {
       final credential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(
               email: user_email, password: user_pass)
-          .then((value) =>
-              signUpSuccessfulMassege(user_name, user_email, user_pass, context))
-          .catchError((error) => unsuccessfulmassege(context, error));
+          .then((value) {
+        signUpLoading = false;
+        notifyListeners();
+        signUpSuccessfulMassege(user_name, user_email, user_pass, context);
+      }).catchError((error) {
+        signUpLoading = false;
+        notifyListeners();
+        signUpUnsuccessfulmassege(context, error);});
 
       try {
         final user = FirebaseAuth.instance.currentUser;
         await user!.sendEmailVerification();
       } catch (error) {
+        signUpLoading =false;
+        notifyListeners();
         print(error);
       }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
+        signUpLoading =false;
+        notifyListeners();
         print('The password provided is too weak.');
       } else if (e.code == 'email-already-in-use') {
+        signUpLoading =false;
+        notifyListeners();
         print('The account already exists for that email.');
       }
     } catch (e) {
+      signUpLoading =false;
+      notifyListeners();
       print(e);
     }
   }
@@ -60,6 +79,7 @@ class FireBaseHelper extends ChangeNotifier{
 
   //FOR SignUp SUCCESSFUL Dialog MASSEGE+++++++++++++++
   signUpSuccessfulMassege(user_name, user_email, user_pass, context) {
+
     addUser(
         user_name: user_name,
         user_email: user_email,
@@ -99,7 +119,9 @@ class FireBaseHelper extends ChangeNotifier{
   //FOR Signup SUCCESSFUL Dialog MASSEGE---------------
 
   //FOR UNSUCCESSFUL Dialog MASSEGE+++++++++++++++
-  unsuccessfulmassege(context, value) {
+  signUpUnsuccessfulmassege(context, value) {
+    signUpLoading = false;
+    notifyListeners();
     Alert(
       context: context,
       buttons: [
@@ -122,6 +144,10 @@ class FireBaseHelper extends ChangeNotifier{
 
   //FOR USER SIGN IN+++++++++++++++++++++++++++++++++++++++++++++
   userSignin({user_email, user_pass, context}) async {
+
+    signInLoading = true;
+    notifyListeners();
+
     try {
       UserCredential credential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: user_email, password: user_pass);
@@ -131,22 +157,29 @@ class FireBaseHelper extends ChangeNotifier{
       if (user!.uid.isNotEmpty) {
         if(user.emailVerified){
           print('Sign in successful');
-
+          signInLoading = false;
+          notifyListeners();
           Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(builder: (context) => CustomBottomNavBar()),
                   (route) => false);
         }
         else{
           print('Email is not verified');
+          signInLoading = false;
+          notifyListeners();
           signInFailedMassege(context, 'Email is not verified');
         }
       }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         print('Their have no user with this email');
+        signInLoading = false;
+        notifyListeners();
         signInFailedMassege(context, e);
       } else if (e.code == 'wrong-password') {
         print('Your Given password is wrong');
+        signInLoading = false;
+        notifyListeners();
         signInFailedMassege(context, e);
       }
     }
@@ -216,6 +249,9 @@ class FireBaseHelper extends ChangeNotifier{
   //FOR PROFILE UPDATE AFTER EDIT+++++++++++++++++++++++++++++
   Future<void> updateUserProfile({user_name, user_phone, user_address, imageFile, context}) async{
 
+    profileUpdateLoading = true;
+    notifyListeners();
+
     FirebaseStorage firebaseStorage =FirebaseStorage.instance;
 
     UploadTask uploadTask = firebaseStorage.ref('profile').child('imageFile').putFile(imageFile);
@@ -230,12 +266,19 @@ class FireBaseHelper extends ChangeNotifier{
       'phone': user_phone,
       'address': user_address,
       'img' : imageUrl
-    }).then((value) => profileUpdateSuccessfulMassege(context));
+    }).then((value) {
+      profileUpdateLoading = true;
+      notifyListeners();
+      profileUpdateSuccessfulMassege(context);
+    } );
+
   }
   //FOR PROFILE UPDATE AFTER EDIT-------------------------------------------
 
   //FOR SUCCESSFUL Dialog MASSEGE+++++++++++++++
   profileUpdateSuccessfulMassege(context) {
+    profileUpdateLoading = false;
+    notifyListeners();
     Alert(
       context: context,
       buttons: [
@@ -248,6 +291,7 @@ class FireBaseHelper extends ChangeNotifier{
             Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(builder: (context) => CustomBottomNavBar()),
                     (route) => false);
+            //Navigator.of(context,rootNavigator: true).pop();
           },
           color: Color(0xFF006847),
         )
@@ -258,6 +302,7 @@ class FireBaseHelper extends ChangeNotifier{
           fontSize: 14,
         ),
         isOverlayTapDismiss: false,
+        isCloseButton: false,
       ),
       image: Image(
         image: AssetImage('assets/images/checked.png'),

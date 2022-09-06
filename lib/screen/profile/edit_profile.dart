@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 
 import '../../custom_things/custom_text_feild/custom_text_feild.dart';
 import '../../helper/firebase_helper.dart';
@@ -246,8 +247,8 @@ class _EditProfileState extends State<EditProfile> {
                             flex: 5,
                             child: ElevatedButton(onPressed: () {
                               File imageFile = File(profileImage!.path);
-                              FireBaseHelper().updateUserProfile(imageFile: imageFile, user_name: nameController.text, user_phone: phoneController.text,user_address: addressController.text, context: context);
-                              }, child: Text('Save'),
+                              (Provider.of<FireBaseHelper>(context,listen: false).updateUserProfile(imageFile: imageFile, user_name: nameController.text, user_phone: phoneController.text,user_address: addressController.text, context: context));
+                            }, child: (Provider.of<FireBaseHelper>(context).profileUpdateLoading)?CircularProgressIndicator(color: Colors.white,):Text('Save'),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Color(0xFF006847),
                                 fixedSize: Size(double.infinity, 45),
