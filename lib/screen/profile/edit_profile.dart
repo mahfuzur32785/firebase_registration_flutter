@@ -247,7 +247,8 @@ class _EditProfileState extends State<EditProfile> {
                             flex: 5,
                             child: ElevatedButton(onPressed: () {
                               File imageFile = File(profileImage!.path);
-                              (Provider.of<FireBaseHelper>(context,listen: false).updateUserProfile(imageFile: imageFile, user_name: nameController.text, user_phone: phoneController.text,user_address: addressController.text, context: context));
+                              final img = '${widget.img}';
+                              (Provider.of<FireBaseHelper>(context,listen: false).updateUserProfile(img: img, imageFile: imageFile, user_name: nameController.text, user_phone: phoneController.text,user_address: addressController.text, context: context));
                             }, child: (Provider.of<FireBaseHelper>(context).profileUpdateLoading)?CircularProgressIndicator(color: Colors.white,):Text('Save'),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Color(0xFF006847),

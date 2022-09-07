@@ -247,31 +247,44 @@ class FireBaseHelper with ChangeNotifier{
   //FOR SIGN OUT CONFIRM DIALOG ------------------------------
 
   //FOR PROFILE UPDATE AFTER EDIT+++++++++++++++++++++++++++++
-  Future<void> updateUserProfile({user_name, user_phone, user_address, imageFile, context}) async{
+  Future<void> updateUserProfile({img, user_name, user_phone, user_address, imageFile, context}) async{
 
     profileUpdateLoading = true;
     notifyListeners();
 
-    FirebaseStorage firebaseStorage =FirebaseStorage.instance;
+    if(imageFile!=null){
+      print(imageFile);
+      FirebaseStorage firebaseStorage =FirebaseStorage.instance;
 
-    UploadTask uploadTask = firebaseStorage.ref('profile').child('imageFile').putFile(imageFile);
-    TaskSnapshot taskSnapshot = await uploadTask;
+      UploadTask uploadTask = firebaseStorage.ref('profile').child('imageFile').putFile(imageFile);
+      TaskSnapshot taskSnapshot = await uploadTask;
 
-    String imageUrl = await taskSnapshot.ref.getDownloadURL();
+      String imageUrl = await taskSnapshot.ref.getDownloadURL();
 
-    CollectionReference users = FirebaseFirestore.instance.collection('users');
-    final getId = FirebaseAuth.instance.currentUser!.uid;
-    return users.doc(getId).update({
-      'name': user_name,
-      'phone': user_phone,
-      'address': user_address,
-      'img' : imageUrl
-    }).then((value) {
-      profileUpdateLoading = true;
-      notifyListeners();
-      profileUpdateSuccessfulMassege(context);
-    } );
-
+      CollectionReference users = FirebaseFirestore.instance.collection('users');
+      final getId = FirebaseAuth.instance.currentUser!.uid;
+      return users.doc(getId).update({
+        'name': user_name,
+        'phone': user_phone,
+        'address': user_address,
+        'img' : imageUrl
+      }).then((value) {
+        profileUpdateLoading = true;
+        notifyListeners();
+        profileUpdateSuccessfulMassege(context);
+      } );
+    }
+    else{
+       CollectionReference users = FirebaseFirestore.instance.collection('users');
+      final getId = FirebaseAuth.instance.currentUser!.uid;
+      return users.doc(getId).update({
+        'img' : img
+      }).then((value) {
+        profileUpdateLoading = true;
+        notifyListeners();
+        profileUpdateSuccessfulMassege(context);
+      } );
+    }
   }
   //FOR PROFILE UPDATE AFTER EDIT-------------------------------------------
 

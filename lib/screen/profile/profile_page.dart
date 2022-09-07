@@ -150,7 +150,7 @@ class ProfilePage extends StatelessWidget {
                       child: CircleAvatar(
                         radius: 60,
                         backgroundColor: Color(0xFF006847),
-                        child: CircularProgressIndicator(),
+                        child: CircularProgressIndicator(color: Colors.white,),
                       ),
                     ),
                     Container(
