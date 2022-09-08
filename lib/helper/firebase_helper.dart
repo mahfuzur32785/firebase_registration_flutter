@@ -9,16 +9,15 @@ import 'package:rflutter_alert/rflutter_alert.dart';
 import '../auth_screen/signin_page.dart';
 import '../custom_things/nav_bar/custom_btm_nav_bar.dart';
 
-class FireBaseHelper with ChangeNotifier{
-  bool userSignInLoading =false;
+class FireBaseHelper with ChangeNotifier {
+  bool userSignInLoading = false;
   bool signUpLoading = false;
   bool profileUpdateLoading = false;
   bool adminSignInLoading = false;
 
   //FOR SIGNUP ++++++++++++++++++++++++++++++++
   Future<void> createUser({user_name, user_email, user_pass, context}) async {
-
-    signUpLoading =true;
+    signUpLoading = true;
     notifyListeners();
     try {
       final credential = await FirebaseAuth.instance
@@ -31,28 +30,29 @@ class FireBaseHelper with ChangeNotifier{
       }).catchError((error) {
         signUpLoading = false;
         notifyListeners();
-        signUpUnsuccessfulmassege(context, error);});
+        signUpUnsuccessfulmassege(context, error);
+      });
 
       try {
         final user = FirebaseAuth.instance.currentUser;
         await user!.sendEmailVerification();
       } catch (error) {
-        signUpLoading =false;
+        signUpLoading = false;
         notifyListeners();
         print(error);
       }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
-        signUpLoading =false;
+        signUpLoading = false;
         notifyListeners();
         print('The password provided is too weak.');
       } else if (e.code == 'email-already-in-use') {
-        signUpLoading =false;
+        signUpLoading = false;
         notifyListeners();
         print('The account already exists for that email.');
       }
     } catch (e) {
-      signUpLoading =false;
+      signUpLoading = false;
       notifyListeners();
       print(e);
     }
@@ -67,7 +67,8 @@ class FireBaseHelper with ChangeNotifier{
     //final docId = getId.id;
     //print('Doc Id is '+getId.id);
 
-    return users.doc(getId).set({'id': getId,
+    return users.doc(getId).set({
+      'id': getId,
       'name': user_name,
       'email': user_email,
       'password': user_pass
@@ -81,7 +82,6 @@ class FireBaseHelper with ChangeNotifier{
 
   //FOR SignUp SUCCESSFUL Dialog MASSEGE+++++++++++++++
   signUpSuccessfulMassege(user_name, user_email, user_pass, context) {
-
     addUser(
         user_name: user_name,
         user_email: user_email,
@@ -126,8 +126,7 @@ class FireBaseHelper with ChangeNotifier{
     notifyListeners();
     Alert(
       context: context,
-      buttons: [
-      ],
+      buttons: [],
       title: "Sign Up Unsuccessful",
       desc: "Their have something error. $value",
       style: AlertStyle(
@@ -146,7 +145,6 @@ class FireBaseHelper with ChangeNotifier{
 
   //FOR USER SIGN IN+++++++++++++++++++++++++++++++++++++++++++++
   userSignin({user_email, user_pass, context}) async {
-
     userSignInLoading = true;
     notifyListeners();
 
@@ -157,15 +155,14 @@ class FireBaseHelper with ChangeNotifier{
       final user = credential.user;
 
       if (user!.uid.isNotEmpty) {
-        if(user.emailVerified){
+        if (user.emailVerified) {
           print('Sign in successful');
           userSignInLoading = false;
           notifyListeners();
           Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(builder: (context) => CustomBottomNavBar()),
-                  (route) => false);
-        }
-        else{
+              (route) => false);
+        } else {
           print('Email is not verified');
           userSignInLoading = false;
           notifyListeners();
@@ -192,8 +189,7 @@ class FireBaseHelper with ChangeNotifier{
   signInFailedMassege(context, e) {
     Alert(
       context: context,
-      buttons: [
-      ],
+      buttons: [],
       title: "Sign In Failed",
       desc: "Their have something error. $e",
       style: AlertStyle(
@@ -212,28 +208,33 @@ class FireBaseHelper with ChangeNotifier{
 
   // FOR ADMIN SIGN IN+++++++++++++++++++++++++++++++++++++++++++++
   adminSignin({user_email, user_pass, context}) async {
-
     adminSignInLoading = true;
     notifyListeners();
 
-    Future<bool> userExists(user_email , user_pass) async {
-      return await FirebaseFirestore.instance.collection('admin')
+    Future<bool> userExists(user_email, user_pass) async {
+      return await FirebaseFirestore.instance
+          .collection('admin')
           .where('email', isEqualTo: user_email)
           .where('pass', isEqualTo: user_pass)
           .get()
           .then((value) => value.size > 0 ? true : false);
     }
-      bool result = await userExists(user_email,user_pass);
-      if(result == true){
-        adminSignInLoading = false;
-        notifyListeners();
-        Navigator.pushAndRemoveUntil(
-            context, MaterialPageRoute(builder: (context) => AdminPage()), (route) => false,);
-      }else{
-        adminSignInLoading = false;
-        notifyListeners();
-        adminSignInFailedMassege(context, 'Admin not found with this email and password');
-      }
+
+    bool result = await userExists(user_email, user_pass);
+    if (result == true) {
+      adminSignInLoading = false;
+      notifyListeners();
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => AdminPage()),
+        (route) => false,
+      );
+    } else {
+      adminSignInLoading = false;
+      notifyListeners();
+      adminSignInFailedMassege(
+          context, 'Admin not found with this email and password');
+    }
   }
   //FOR ADMIN SIGN IN------------------------------------------
 
@@ -241,8 +242,7 @@ class FireBaseHelper with ChangeNotifier{
   adminSignInFailedMassege(context, e) {
     Alert(
       context: context,
-      buttons: [
-      ],
+      buttons: [],
       title: "Admin Sign In Failed",
       desc: "Their have something error. $e",
       style: AlertStyle(
@@ -261,7 +261,9 @@ class FireBaseHelper with ChangeNotifier{
 
   //FOR USER SIGN OUT++++++++++++++++++++++++++++++
   Future<void> signOut(context) async {
-    await FirebaseAuth.instance.signOut().then((value) => signOutDialog(context));
+    await FirebaseAuth.instance
+        .signOut()
+        .then((value) => signOutDialog(context));
   }
   //FOR USER SIGN OUT--------------------------------
 
@@ -271,15 +273,27 @@ class FireBaseHelper with ChangeNotifier{
       context: context,
       buttons: [
         DialogButton(
-          color:  Color(0xFF006847),
-          child: Text('No',style: TextStyle(color: Colors.white),), onPressed: () {
-          Navigator.of(context).pop();
-        },),
+          color: Color(0xFF006847),
+          child: Text(
+            'No',
+            style: TextStyle(color: Colors.white),
+          ),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
         DialogButton(
           color: Color(0xFF006847),
-          child: Text('Yes',style: TextStyle(color: Colors.white),), onPressed: () {
-          Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context)=>SignInPage()), (route) => false);
-        },),
+          child: Text(
+            'Yes',
+            style: TextStyle(color: Colors.white),
+          ),
+          onPressed: () {
+            Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => SignInPage()),
+                (route) => false);
+          },
+        ),
       ],
       title: "Are you Sure?",
       desc: "Do you want to sign out from this app",
@@ -298,43 +312,43 @@ class FireBaseHelper with ChangeNotifier{
   //FOR SIGN OUT CONFIRM DIALOG ------------------------------
 
   //FOR PROFILE UPDATE AFTER EDIT+++++++++++++++++++++++++++++
-  Future<void> updateUserProfile({img, user_name, user_phone, user_address, imageFile, context}) async{
-
+  Future<void> updateUserProfile(
+      {img, user_name, user_phone, user_address, imageFile, context}) async {
     profileUpdateLoading = true;
     notifyListeners();
 
-    if(imageFile!=null){
+    if (imageFile != null) {
       print(imageFile);
-      FirebaseStorage firebaseStorage =FirebaseStorage.instance;
+      FirebaseStorage firebaseStorage = FirebaseStorage.instance;
 
-      UploadTask uploadTask = firebaseStorage.ref('profile').child('imageFile').putFile(imageFile);
+      UploadTask uploadTask =
+          firebaseStorage.ref('profile').child('imageFile').putFile(imageFile);
       TaskSnapshot taskSnapshot = await uploadTask;
 
       String imageUrl = await taskSnapshot.ref.getDownloadURL();
 
-      CollectionReference users = FirebaseFirestore.instance.collection('users');
+      CollectionReference users =
+          FirebaseFirestore.instance.collection('users');
       final getId = FirebaseAuth.instance.currentUser!.uid;
       return users.doc(getId).update({
         'name': user_name,
         'phone': user_phone,
         'address': user_address,
-        'img' : imageUrl
+        'img': imageUrl
       }).then((value) {
         profileUpdateLoading = true;
         notifyListeners();
         profileUpdateSuccessfulMassege(context);
-      } );
-    }
-    else{
-       CollectionReference users = FirebaseFirestore.instance.collection('users');
+      });
+    } else {
+      CollectionReference users =
+          FirebaseFirestore.instance.collection('users');
       final getId = FirebaseAuth.instance.currentUser!.uid;
-      return users.doc(getId).update({
-        'img' : img
-      }).then((value) {
+      return users.doc(getId).update({'img': img}).then((value) {
         profileUpdateLoading = true;
         notifyListeners();
         profileUpdateSuccessfulMassege(context);
-      } );
+      });
     }
   }
   //FOR PROFILE UPDATE AFTER EDIT-------------------------------------------
@@ -354,7 +368,7 @@ class FireBaseHelper with ChangeNotifier{
           onPressed: () {
             Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(builder: (context) => CustomBottomNavBar()),
-                    (route) => false);
+                (route) => false);
             //Navigator.of(context,rootNavigator: true).pop();
           },
           color: Color(0xFF006847),
@@ -377,20 +391,69 @@ class FireBaseHelper with ChangeNotifier{
   //FOR SUCCESSFUL Dialog MASSEGE---------------
 
   //FOR UPLOAD BIKE INFORMATION++++++++++++++++++++++++
-  Future<void> addBikeData({
-  name, price, length, height, width, wheel_base, ground_clear, weight, fuel_capacity, engine_type, displacement,
-    max_power, max_tork, stering_type, gear_type, number_gear, tyre_f_size, tyre_r_size, wheel_size, front_break,
-    rear_break, battery_type, head_lemp, img, context}) {
+  Future<void> addBikeData(
+      {name,
+      price,
+      length,
+      height,
+      width,
+      wheel_base,
+      ground_clear,
+      weight,
+      fuel_capacity,
+      engine_type,
+      displacement,
+      max_power,
+      max_tork,
+      stering_type,
+      gear_type,
+      number_gear,
+      tyre_f_size,
+      tyre_r_size,
+      wheel_size,
+      front_break,
+      rear_break,
+      battery_type,
+      head_lemp,
+      imageFile,
+      imageName,
+      context}) async {
+    FirebaseStorage firebaseStorage = FirebaseStorage.instance;
+
+    UploadTask uploadTask =
+        firebaseStorage.ref('bike_image').child('bikeImage').putFile(imageFile);
+    TaskSnapshot taskSnapshot = await uploadTask;
+
+    String imageUrl = await taskSnapshot.ref.getDownloadURL();
+
     // Call the user's CollectionReference to add a new user
     final adminPost = FirebaseFirestore.instance.collection('admin_post').doc();
 
     return adminPost.set({
-      'name' : name, 'price' : price, 'length' : length, 'height' : height, 'width' : width,
-      'wheel_base' : wheel_base, 'ground_clear' : ground_clear, 'weight' : weight, 'fuel_capacity': fuel_capacity,
-      'engine_type': engine_type, 'displacement': displacement, 'max_power': max_power, 'max_tork': max_tork,
-      'stering_type': stering_type, 'gear_type':gear_type, 'number_gear': number_gear,'tyre_f_size':tyre_f_size,
-      'tyre_r_size':tyre_r_size, 'wheel_size':wheel_size, 'front_break':front_break,'rear_break':rear_break,
-      'battery_type':battery_type, 'head_lemp': head_lemp, 'img':img
+      'name': name,
+      'price': price,
+      'length': length,
+      'height': height,
+      'width': width,
+      'wheel_base': wheel_base,
+      'ground_clear': ground_clear,
+      'weight': weight,
+      'fuel_capacity': fuel_capacity,
+      'engine_type': engine_type,
+      'displacement': displacement,
+      'max_power': max_power,
+      'max_tork': max_tork,
+      'stering_type': stering_type,
+      'gear_type': gear_type,
+      'number_gear': number_gear,
+      'tyre_f_size': tyre_f_size,
+      'tyre_r_size': tyre_r_size,
+      'wheel_size': wheel_size,
+      'front_break': front_break,
+      'rear_break': rear_break,
+      'battery_type': battery_type,
+      'head_lemp': head_lemp,
+      'img': imageUrl
     });
 /*
         .add({'name': user_name, 'email': user_email, 'password': user_pass})
