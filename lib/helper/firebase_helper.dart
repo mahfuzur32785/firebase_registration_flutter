@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_project/admin/admin_page.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -9,9 +10,10 @@ import '../auth_screen/signin_page.dart';
 import '../custom_things/nav_bar/custom_btm_nav_bar.dart';
 
 class FireBaseHelper with ChangeNotifier{
-  bool signInLoading =false;
+  bool userSignInLoading =false;
   bool signUpLoading = false;
   bool profileUpdateLoading = false;
+  bool adminSignInLoading = false;
 
   //FOR SIGNUP ++++++++++++++++++++++++++++++++
   Future<void> createUser({user_name, user_email, user_pass, context}) async {
@@ -145,7 +147,7 @@ class FireBaseHelper with ChangeNotifier{
   //FOR USER SIGN IN+++++++++++++++++++++++++++++++++++++++++++++
   userSignin({user_email, user_pass, context}) async {
 
-    signInLoading = true;
+    userSignInLoading = true;
     notifyListeners();
 
     try {
@@ -157,7 +159,7 @@ class FireBaseHelper with ChangeNotifier{
       if (user!.uid.isNotEmpty) {
         if(user.emailVerified){
           print('Sign in successful');
-          signInLoading = false;
+          userSignInLoading = false;
           notifyListeners();
           Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(builder: (context) => CustomBottomNavBar()),
@@ -165,7 +167,7 @@ class FireBaseHelper with ChangeNotifier{
         }
         else{
           print('Email is not verified');
-          signInLoading = false;
+          userSignInLoading = false;
           notifyListeners();
           signInFailedMassege(context, 'Email is not verified');
         }
@@ -173,12 +175,12 @@ class FireBaseHelper with ChangeNotifier{
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         print('Their have no user with this email');
-        signInLoading = false;
+        userSignInLoading = false;
         notifyListeners();
         signInFailedMassege(context, e);
       } else if (e.code == 'wrong-password') {
         print('Your Given password is wrong');
-        signInLoading = false;
+        userSignInLoading = false;
         notifyListeners();
         signInFailedMassege(context, e);
       }
@@ -207,6 +209,55 @@ class FireBaseHelper with ChangeNotifier{
     ).show();
   }
   //FOR SIGN IN FAILED Dialog---------------------
+
+  // FOR ADMIN SIGN IN+++++++++++++++++++++++++++++++++++++++++++++
+  adminSignin({user_email, user_pass, context}) async {
+
+    adminSignInLoading = true;
+    notifyListeners();
+
+    Future<bool> userExists(user_email , user_pass) async {
+      return await FirebaseFirestore.instance.collection('admin')
+          .where('email', isEqualTo: user_email)
+          .where('pass', isEqualTo: user_pass)
+          .get()
+          .then((value) => value.size > 0 ? true : false);
+    }
+      bool result = await userExists(user_email,user_pass);
+      if(result == true){
+        adminSignInLoading = false;
+        notifyListeners();
+        Navigator.pushAndRemoveUntil(
+            context, MaterialPageRoute(builder: (context) => AdminPage()), (route) => false,);
+      }else{
+        adminSignInLoading = false;
+        notifyListeners();
+        adminSignInFailedMassege(context, 'Admin not found with this email and password');
+      }
+  }
+  //FOR ADMIN SIGN IN------------------------------------------
+
+  //FOR ADMIN SIGN IN FAILED Dialog+++++++++++++++++++
+  adminSignInFailedMassege(context, e) {
+    Alert(
+      context: context,
+      buttons: [
+      ],
+      title: "Admin Sign In Failed",
+      desc: "Their have something error. $e",
+      style: AlertStyle(
+        descStyle: TextStyle(
+          fontSize: 14,
+        ),
+        isOverlayTapDismiss: true,
+      ),
+      image: Image(
+        image: AssetImage('assets/images/cancel.png'),
+        height: MediaQuery.of(context).size.height * 0.1,
+      ),
+    ).show();
+  }
+  //FOR ADMIN SIGN IN FAILED Dialog---------------------
 
   //FOR USER SIGN OUT++++++++++++++++++++++++++++++
   Future<void> signOut(context) async {
@@ -324,4 +375,28 @@ class FireBaseHelper with ChangeNotifier{
     ).show();
   }
   //FOR SUCCESSFUL Dialog MASSEGE---------------
+
+  //FOR UPLOAD BIKE INFORMATION++++++++++++++++++++++++
+  Future<void> addBikeData({
+  name, price, length, height, width, wheel_base, ground_clear, weight, fuel_capacity, engine_type, displacement,
+    max_power, max_tork, stering_type, gear_type, number_gear, tyre_f_size, tyre_r_size, wheel_size, front_break,
+    rear_break, battery_type, head_lemp, img, context}) {
+    // Call the user's CollectionReference to add a new user
+    final adminPost = FirebaseFirestore.instance.collection('admin_post').doc();
+
+    return adminPost.set({
+      'name' : name, 'price' : price, 'length' : length, 'height' : height, 'width' : width,
+      'wheel_base' : wheel_base, 'ground_clear' : ground_clear, 'weight' : weight, 'fuel_capacity': fuel_capacity,
+      'engine_type': engine_type, 'displacement': displacement, 'max_power': max_power, 'max_tork': max_tork,
+      'stering_type': stering_type, 'gear_type':gear_type, 'number_gear': number_gear,'tyre_f_size':tyre_f_size,
+      'tyre_r_size':tyre_r_size, 'wheel_size':wheel_size, 'front_break':front_break,'rear_break':rear_break,
+      'battery_type':battery_type, 'head_lemp': head_lemp, 'img':img
+    });
+/*
+        .add({'name': user_name, 'email': user_email, 'password': user_pass})
+        .then((value) => print("User Added"))
+        .catchError((error) => print("Failed to add user: $error"));*/
+  }
+  //FOR UPLOAD BIKE INFORMATION------------------------------
+
 }

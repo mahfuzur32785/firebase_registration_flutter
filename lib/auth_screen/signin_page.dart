@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:firebase_project/auth_screen/signup_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -12,7 +13,6 @@ class SignInPage extends StatefulWidget {
 }
 
 class _SignInPageState extends State<SignInPage> {
-
   TextEditingController emailController = TextEditingController();
   TextEditingController passController = TextEditingController();
 
@@ -84,13 +84,13 @@ class _SignInPageState extends State<SignInPage> {
                   suffixIcon: IconButton(
                     icon: isObsecure == false
                         ? Icon(
-                      Icons.visibility,
-                      color: Color(0xFF6F7471),
-                    )
+                            Icons.visibility,
+                            color: Color(0xFF6F7471),
+                          )
                         : Icon(
-                      Icons.visibility_off,
-                      color: Color(0xFF6F7471),
-                    ),
+                            Icons.visibility_off,
+                            color: Color(0xFF6F7471),
+                          ),
                     onPressed: () {
                       setState(() {
                         isObsecure = !isObsecure;
@@ -122,9 +122,12 @@ class _SignInPageState extends State<SignInPage> {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    if(_formKey.currentState!.validate()){
-
-                      Provider.of<FireBaseHelper>(context,listen: false).userSignin(user_email: emailController.text, user_pass: passController.text, context: context);
+                    if (_formKey.currentState!.validate()) {
+                      Provider.of<FireBaseHelper>(context, listen: false)
+                          .userSignin(
+                              user_email: emailController.text,
+                              user_pass: passController.text,
+                              context: context);
 
                       //FireBaseHelper().userSignin(user_email: emailController.text, user_pass: passController.text, context: context, );
                     }
@@ -138,7 +141,11 @@ class _SignInPageState extends State<SignInPage> {
                     fixedSize: Size(MediaQuery.of(context).size.width * 1,
                         MediaQuery.of(context).size.height * 0.06),
                   ),
-                  child: (Provider.of<FireBaseHelper>(context).signInLoading)?const CircularProgressIndicator(color: Colors.white,): const Text('SIGN IN'),
+                  child: (Provider.of<FireBaseHelper>(context).userSignInLoading)
+                      ? const CircularProgressIndicator(
+                          color: Colors.white,
+                        )
+                      : const Text('SIGN IN'),
                 ),
                 SizedBox(
                   height: MediaQuery.of(context).size.height * 0.02,
@@ -152,22 +159,22 @@ class _SignInPageState extends State<SignInPage> {
                       onPressed: null,
                       child: Text(
                         'Don\'t have account?',
-                        style: TextStyle(
-                          color: Color(0xFFCCCDCD),
-                        ),
+                        style:
+                            TextStyle(color: Color(0xFFCCCDCD), fontSize: 12),
                       ),
                     ),
                     TextButton(
                       style: TextButton.styleFrom(
                           splashFactory: NoSplash.splashFactory),
                       onPressed: () {
-                        Navigator.of(context).push(MaterialPageRoute(builder: (context)=>SignUpPage()));
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => SignUpPage()));
                       },
-                      child: Text(
+                      child: AutoSizeText(
                         'Create new account',
-                        style: TextStyle(
-                          color: Color(0xFF22A45D),
-                        ),
+                        style:
+                            TextStyle(color: Color(0xFF22A45D), fontSize: 14),
+                        minFontSize: 12,
                       ),
                     ),
                   ],
@@ -253,6 +260,34 @@ class _SignInPageState extends State<SignInPage> {
                       ),
                     ],
                   ),
+                ),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.02,
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFF006847),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    fixedSize: Size(MediaQuery.of(context).size.width * 1,
+                        MediaQuery.of(context).size.height * 0.06),
+                  ),
+                  child: (Provider.of<FireBaseHelper>(context).adminSignInLoading)
+                      ? const CircularProgressIndicator(
+                          color: Colors.white,
+                        )
+                      : const Text('Admin LogIn'),
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      Provider.of<FireBaseHelper>(context, listen: false)
+                          .adminSignin(
+                              user_email: emailController.text,
+                              user_pass: passController.text,
+                              context: context,
+                      );
+                    }
+                  },
                 ),
               ],
             ),
