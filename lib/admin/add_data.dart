@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 
 import '../custom_things/custom_text_feild/custom_text_feild.dart';
 import '../helper/firebase_helper.dart';
@@ -37,6 +38,7 @@ class _AddBikeDataState extends State<AddBikeData> {
   TextEditingController rearBreakController = TextEditingController();
   TextEditingController batteryTypeController = TextEditingController();
   TextEditingController headLempCntroller = TextEditingController();
+  TextEditingController bikeCategoryController = TextEditingController();
 
   XFile? bikeImage;
 
@@ -438,8 +440,8 @@ class _AddBikeDataState extends State<AddBikeData> {
                             ),
                           ),
                           Positioned(
-                            bottom: 20,
-                            right: 20,
+                            bottom: 0,
+                            right: 0,
                             child: Row(
                               children: [
                                 IconButton(
@@ -448,7 +450,11 @@ class _AddBikeDataState extends State<AddBikeData> {
                                       bikeImage = null;
                                     });
                                   },
-                                  icon: Icon(Icons.delete),
+                                  icon: Icon(
+                                    Icons.delete,
+                                    color: Colors.white,
+                                    size: 30,
+                                  ),
                                 ),
                                 IconButton(
                                   onPressed: () {
@@ -482,40 +488,65 @@ class _AddBikeDataState extends State<AddBikeData> {
               //Upload Button ++++++++++++++++++++++
               Align(
                 alignment: Alignment.center,
-                child: ElevatedButton(
-                  onPressed: () {
-                    File imageFile = File(bikeImage!.path);
-                    FireBaseHelper().addBikeData(
-                      name: nameController.text,
-                      price: priceController.text,
-                      length: lengthController.text,
-                      height: heightController.text,
-                      width: widthController.text,
-                      wheel_base: wheelBaseController.text,
-                      ground_clear: groundClearController.text,
-                      weight: weightController.text,
-                      fuel_capacity: fuelCapacityController.text,
-                      engine_type: engineTypeController.text,
-                      displacement: displacementController.text,
-                      max_power: maxPowerController.text,
-                      max_tork: maxTorqueController.text,
-                      stering_type: staringTypeController.text,
-                      gear_type: gearTypeController.text,
-                      number_gear: numberGearController.text,
-                      tyre_f_size: tyreFSizeController.text,
-                      tyre_r_size: tyreRSizeController.text,
-                      wheel_size: wheelSizeController.text,
-                      front_break: frontBreakController.text,
-                      rear_break: rearBreakController.text,
-                      battery_type: batteryTypeController.text,
-                      head_lemp: headLempCntroller.text,
-                      imageFile: imageFile,
-                    );
-                  },
-                  child: Text('Upload'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF006847),
-                  ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        height: 50,
+                      child: CustomTextFeild(
+                        obscureText: false,
+                        hintText: 'Bike Category',
+                        controller: bikeCategoryController,
+                      ),
+                    ),
+                      flex: 3,
+                    ),
+                    SizedBox(width: 10,),
+                    Expanded(
+                      flex: 2,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          File imageFile = File(bikeImage!.path);
+                          Provider.of<FireBaseHelper>(context, listen: false)
+                              .addBikeData(
+                            name: nameController.text,
+                            price: priceController.text,
+                            length: lengthController.text,
+                            height: heightController.text,
+                            width: widthController.text,
+                            wheel_base: wheelBaseController.text,
+                            ground_clear: groundClearController.text,
+                            weight: weightController.text,
+                            fuel_capacity: fuelCapacityController.text,
+                            engine_type: engineTypeController.text,
+                            displacement: displacementController.text,
+                            max_power: maxPowerController.text,
+                            max_tork: maxTorqueController.text,
+                            stering_type: staringTypeController.text,
+                            gear_type: gearTypeController.text,
+                            number_gear: numberGearController.text,
+                            tyre_f_size: tyreFSizeController.text,
+                            tyre_r_size: tyreRSizeController.text,
+                            wheel_size: wheelSizeController.text,
+                            front_break: frontBreakController.text,
+                            rear_break: rearBreakController.text,
+                            battery_type: batteryTypeController.text,
+                            head_lemp: headLempCntroller.text,
+                            imageFile: imageFile,
+                            category: bikeCategoryController.text
+                          );
+                        },
+                        child: (Provider.of<FireBaseHelper>(context).addBikeDalaLoading)
+                            ? const CircularProgressIndicator(
+                          color: Colors.white,
+                        )
+                            : const Text('Upload Data'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xFF006847),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               )
             ],

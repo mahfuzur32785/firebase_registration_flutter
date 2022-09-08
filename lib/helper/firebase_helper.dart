@@ -14,6 +14,7 @@ class FireBaseHelper with ChangeNotifier {
   bool signUpLoading = false;
   bool profileUpdateLoading = false;
   bool adminSignInLoading = false;
+  bool addBikeDalaLoading = false;
 
   //FOR SIGNUP ++++++++++++++++++++++++++++++++
   Future<void> createUser({user_name, user_email, user_pass, context}) async {
@@ -391,7 +392,7 @@ class FireBaseHelper with ChangeNotifier {
   //FOR SUCCESSFUL Dialog MASSEGE---------------
 
   //FOR UPLOAD BIKE INFORMATION++++++++++++++++++++++++
-  Future<void> addBikeData(
+  addBikeData(
       {name,
       price,
       length,
@@ -416,50 +417,137 @@ class FireBaseHelper with ChangeNotifier {
       battery_type,
       head_lemp,
       imageFile,
-      imageName,
+        category,
       context}) async {
-    FirebaseStorage firebaseStorage = FirebaseStorage.instance;
 
-    UploadTask uploadTask =
-        firebaseStorage.ref('bike_image').child('bikeImage').putFile(imageFile);
-    TaskSnapshot taskSnapshot = await uploadTask;
+    addBikeDalaLoading = true;
+    notifyListeners();
 
-    String imageUrl = await taskSnapshot.ref.getDownloadURL();
+    try{
+      FirebaseStorage firebaseStorage = FirebaseStorage.instance;
 
-    // Call the user's CollectionReference to add a new user
-    final adminPost = FirebaseFirestore.instance.collection('admin_post').doc();
+      UploadTask uploadTask =
+      firebaseStorage.ref('bike_image').child('${name}').putFile(imageFile);
+      TaskSnapshot taskSnapshot = await uploadTask;
 
-    return adminPost.set({
-      'name': name,
-      'price': price,
-      'length': length,
-      'height': height,
-      'width': width,
-      'wheel_base': wheel_base,
-      'ground_clear': ground_clear,
-      'weight': weight,
-      'fuel_capacity': fuel_capacity,
-      'engine_type': engine_type,
-      'displacement': displacement,
-      'max_power': max_power,
-      'max_tork': max_tork,
-      'stering_type': stering_type,
-      'gear_type': gear_type,
-      'number_gear': number_gear,
-      'tyre_f_size': tyre_f_size,
-      'tyre_r_size': tyre_r_size,
-      'wheel_size': wheel_size,
-      'front_break': front_break,
-      'rear_break': rear_break,
-      'battery_type': battery_type,
-      'head_lemp': head_lemp,
-      'img': imageUrl
-    });
-/*
-        .add({'name': user_name, 'email': user_email, 'password': user_pass})
-        .then((value) => print("User Added"))
-        .catchError((error) => print("Failed to add user: $error"));*/
+      String imageUrl = await taskSnapshot.ref.getDownloadURL();
+      final adminPost = FirebaseFirestore.instance.collection('admin_post').doc();
+
+      return adminPost.set({
+        'name': name,
+        'price': price,
+        'length': length,
+        'height': height,
+        'width': width,
+        'wheel_base': wheel_base,
+        'ground_clear': ground_clear,
+        'weight': weight,
+        'fuel_capacity': fuel_capacity,
+        'engine_type': engine_type,
+        'displacement': displacement,
+        'max_power': max_power,
+        'max_tork': max_tork,
+        'stering_type': stering_type,
+        'gear_type': gear_type,
+        'number_gear': number_gear,
+        'tyre_f_size': tyre_f_size,
+        'tyre_r_size': tyre_r_size,
+        'wheel_size': wheel_size,
+        'front_break': front_break,
+        'rear_break': rear_break,
+        'battery_type': battery_type,
+        'head_lemp': head_lemp,
+        'img': imageUrl,
+        'category': category
+      }).then((value) {
+        addBikeDalaLoading = false;
+        notifyListeners();
+        bikeDataUploadSuccessMessagge(context);
+      }).catchError((error){
+        addBikeDalaLoading = false;
+        notifyListeners();
+        print('Something Error Ghotece $error');
+        bikeDataUploadErrorMessagge(context, error);
+      });
+    }catch(e){
+      addBikeDalaLoading = false;
+      notifyListeners();
+      print('Something Error Ghotece Aikhane $e');
+      bikeDataUploadErrorMessagge(context, e);
+    }
   }
   //FOR UPLOAD BIKE INFORMATION------------------------------
+
+
+  //FOR BIKe Data Upload Dialog MASSEGE+++++++++++++++
+  bikeDataUploadSuccessMessagge(context) {
+    Alert(
+      context: context,
+      buttons: [
+        DialogButton(
+          child: Text(
+            'Go Home',
+            style: TextStyle(color: Colors.white),
+          ),
+          onPressed: () {
+            Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => AdminPage()),
+                    (route) => false);
+            //Navigator.of(context,rootNavigator: true).pop();
+          },
+          color: Color(0xFF006847),
+        )
+      ],
+      title: "Data Added Successful",
+      style: AlertStyle(
+        descStyle: TextStyle(
+          fontSize: 14,
+        ),
+        isOverlayTapDismiss: false,
+        isCloseButton: false,
+      ),
+      image: Image(
+        image: AssetImage('assets/images/checked.png'),
+        height: MediaQuery.of(context).size.height * 0.1,
+      ),
+    ).show();
+  }
+  //FOR BIKe Data Upload Dialog MASSEGE---------------
+
+
+  //FOR BIKe Data Upload Dialog MASSEGE+++++++++++++++
+  bikeDataUploadErrorMessagge(context, error) {
+    Alert(
+      context: context,
+      buttons: [
+        DialogButton(
+          child: Text(
+            'Go Home',
+            style: TextStyle(color: Colors.white),
+          ),
+          onPressed: () {
+            Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => AdminPage()),
+                    (route) => false);
+            //Navigator.of(context,rootNavigator: true).pop();
+          },
+          color: Color(0xFF006847),
+        )
+      ],
+      title: "${error}",
+      style: AlertStyle(
+        descStyle: TextStyle(
+          fontSize: 14,
+        ),
+        isOverlayTapDismiss: false,
+        isCloseButton: false,
+      ),
+      image: Image(
+        image: AssetImage('assets/images/checked.png'),
+        height: MediaQuery.of(context).size.height * 0.1,
+      ),
+    ).show();
+  }
+  //FOR BIKe Data Upload Dialog MASSEGE---------------
 
 }
