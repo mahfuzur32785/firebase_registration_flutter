@@ -30,15 +30,15 @@ class _HomePageState extends State<HomePage> {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return Center(child: CircularProgressIndicator(color: Color(0xFF006847),));
                   }
-
+                  
                   return Container(
                     child: GridView.builder(
                       shrinkWrap: true,
                       physics: NeverScrollableScrollPhysics(),
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
-                          crossAxisSpacing: 10,
-                          mainAxisSpacing: 10
+                          crossAxisSpacing: 5,
+                          mainAxisSpacing: 5
                       ),
                       itemCount: snapshot.data!.docs.length,
                       itemBuilder: (BuildContext context, int index) {
@@ -57,6 +57,7 @@ class _HomePageState extends State<HomePage> {
                                   borderRadius: BorderRadius.circular(10)
                               ),
                               child: Column(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                 children: [
                                   Image(image: NetworkImage(data['img']),
                                     height: 100,
@@ -64,9 +65,8 @@ class _HomePageState extends State<HomePage> {
                                     fit: BoxFit.cover,
                                   ),
                                   Text(data['name']),
-                                  Text(data['price']),
+                                  Text('Price : '+data['price']),
                                 ],
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               ),
                             ),
                           ),

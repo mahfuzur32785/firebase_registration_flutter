@@ -15,6 +15,7 @@ class FireBaseHelper with ChangeNotifier {
   bool profileUpdateLoading = false;
   bool adminSignInLoading = false;
   bool addBikeDalaLoading = false;
+  bool userCardLoading = false;
 
   //FOR SIGNUP ++++++++++++++++++++++++++++++++
   Future<void> createUser({user_name, user_email, user_pass, context}) async {
@@ -337,7 +338,7 @@ class FireBaseHelper with ChangeNotifier {
         'address': user_address,
         'img': imageUrl
       }).then((value) {
-        profileUpdateLoading = true;
+        profileUpdateLoading = false;
         notifyListeners();
         profileUpdateSuccessfulMassege(context);
       });
@@ -549,5 +550,65 @@ class FireBaseHelper with ChangeNotifier {
     ).show();
   }
   //FOR BIKe Data Upload Dialog MASSEGE---------------
+
+  //User Order Card++++++++++++++++++++++++
+  userOrderCardAdd({name, img, price, context}){
+    userCardLoading = true;
+    notifyListeners();
+
+    CollectionReference users_card =
+    FirebaseFirestore.instance.collection('users_card');
+    final getId = FirebaseAuth.instance.currentUser!.uid;
+
+    return users_card.add(
+        {
+          'name': name,
+          'price': price,
+          'img': img,
+          'id': getId
+        }
+    ).then((value) {
+      userCardLoading = false;
+      notifyListeners();
+      print('User Card Added');
+      userCardADDSuccessfulMassege(context);
+    });
+  }
+  //User Order Card----------------------------
+
+  //User Order Card ADD SUCCESS MESSAGE++++++++++++++++++++++++
+  userCardADDSuccessfulMassege(context) {
+    Alert(
+      context: context,
+      buttons: [
+        DialogButton(
+          child: Text(
+            'Go Home',
+            style: TextStyle(color: Colors.white),
+          ),
+          onPressed: () {
+            Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => CustomBottomNavBar()),
+                    (route) => false);
+            //Navigator.of(context,rootNavigator: true).pop();
+          },
+          color: Color(0xFF006847),
+        )
+      ],
+      title: "Card Added Successfully",
+      style: AlertStyle(
+        descStyle: TextStyle(
+          fontSize: 14,
+        ),
+        isOverlayTapDismiss: false,
+        isCloseButton: false,
+      ),
+      image: Image(
+        image: AssetImage('assets/images/checked.png'),
+        height: MediaQuery.of(context).size.height * 0.1,
+      ),
+    ).show();
+  }
+  //User Order Card ADD SUCCESS MESSAGE++++++++++++++++++++++++
 
 }

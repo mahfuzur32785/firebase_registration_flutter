@@ -45,6 +45,7 @@ dependencies:
   auto_size_text: any
   image_cropper: any
   provider: ^6.0.3
+  google_fonts: any
 
 dev_dependencies:
   flutter_test:
