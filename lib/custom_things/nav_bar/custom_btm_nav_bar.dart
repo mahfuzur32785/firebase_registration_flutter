@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_project/custom_things/custom_txt_style/txt_style.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -24,8 +25,22 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
 
   int _index = 0;
   List bodyList = [HomePage(),ContactPage(),ProfilePage()];
+  List<DocumentSnapshot> docs = [];
 
+  @override
+  void didChangeDependencies() async{
+     await FirebaseFirestore.instance
+        .collection('users_card')
+        .where('id', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+        .get().then((value) {
+          docs = value.docs;
+          setState(() {
 
+          });
+    });
+
+    super.didChangeDependencies();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +65,7 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
                   Positioned(
                     top: 10,
                     right: 10,
-                    child: Text('10', style: myStyle(
+                    child: Text('${docs.length}', style: myStyle(
                       color: Colors.red,
                     ),),
                   ),
