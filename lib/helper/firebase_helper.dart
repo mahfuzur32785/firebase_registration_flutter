@@ -418,21 +418,21 @@ class FireBaseHelper with ChangeNotifier {
       battery_type,
       head_lemp,
       imageFile,
-        category,
+      category,
       context}) async {
-
     addBikeDalaLoading = true;
     notifyListeners();
 
-    try{
+    try {
       FirebaseStorage firebaseStorage = FirebaseStorage.instance;
 
       UploadTask uploadTask =
-      firebaseStorage.ref('bike_image').child('${name}').putFile(imageFile);
+          firebaseStorage.ref('bike_image').child('${name}').putFile(imageFile);
       TaskSnapshot taskSnapshot = await uploadTask;
 
       String imageUrl = await taskSnapshot.ref.getDownloadURL();
-      final adminPost = FirebaseFirestore.instance.collection('admin_post').doc();
+      final adminPost =
+          FirebaseFirestore.instance.collection('admin_post').doc();
 
       return adminPost.set({
         'name': name,
@@ -464,13 +464,13 @@ class FireBaseHelper with ChangeNotifier {
         addBikeDalaLoading = false;
         notifyListeners();
         bikeDataUploadSuccessMessagge(context);
-      }).catchError((error){
+      }).catchError((error) {
         addBikeDalaLoading = false;
         notifyListeners();
         print('Something Error Ghotece $error');
         bikeDataUploadErrorMessagge(context, error);
       });
-    }catch(e){
+    } catch (e) {
       addBikeDalaLoading = false;
       notifyListeners();
       print('Something Error Ghotece Aikhane $e');
@@ -478,7 +478,6 @@ class FireBaseHelper with ChangeNotifier {
     }
   }
   //FOR UPLOAD BIKE INFORMATION------------------------------
-
 
   //FOR BIKe Data Upload Dialog MASSEGE+++++++++++++++
   bikeDataUploadSuccessMessagge(context) {
@@ -493,7 +492,7 @@ class FireBaseHelper with ChangeNotifier {
           onPressed: () {
             Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(builder: (context) => AdminPage()),
-                    (route) => false);
+                (route) => false);
             //Navigator.of(context,rootNavigator: true).pop();
           },
           color: Color(0xFF006847),
@@ -515,7 +514,6 @@ class FireBaseHelper with ChangeNotifier {
   }
   //FOR BIKe Data Upload Dialog MASSEGE---------------
 
-
   //FOR BIKe Data Upload Dialog MASSEGE+++++++++++++++
   bikeDataUploadErrorMessagge(context, error) {
     Alert(
@@ -529,7 +527,7 @@ class FireBaseHelper with ChangeNotifier {
           onPressed: () {
             Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(builder: (context) => AdminPage()),
-                    (route) => false);
+                (route) => false);
             //Navigator.of(context,rootNavigator: true).pop();
           },
           color: Color(0xFF006847),
@@ -552,22 +550,16 @@ class FireBaseHelper with ChangeNotifier {
   //FOR BIKe Data Upload Dialog MASSEGE---------------
 
   //User Order Card++++++++++++++++++++++++
-  userOrderCardAdd({name, img, price, context}){
+  userOrderCardAdd({name, img, price, context}) {
     userCardLoading = true;
     notifyListeners();
 
     CollectionReference users_card =
-    FirebaseFirestore.instance.collection('users_card');
+        FirebaseFirestore.instance.collection('users_card');
     final getId = FirebaseAuth.instance.currentUser!.uid;
 
     return users_card.add(
-        {
-          'name': name,
-          'price': price,
-          'img': img,
-          'id': getId
-        }
-    ).then((value) {
+        {'name': name, 'price': price, 'img': img, 'id': getId}).then((value) {
       userCardLoading = false;
       notifyListeners();
       print('User Card Added');
@@ -589,7 +581,7 @@ class FireBaseHelper with ChangeNotifier {
           onPressed: () {
             Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(builder: (context) => CustomBottomNavBar()),
-                    (route) => false);
+                (route) => false);
             //Navigator.of(context,rootNavigator: true).pop();
           },
           color: Color(0xFF006847),
@@ -611,4 +603,20 @@ class FireBaseHelper with ChangeNotifier {
   }
   //User Order Card ADD SUCCESS MESSAGE++++++++++++++++++++++++
 
+  //Delete cart Item+++++++++++++++++++++++++++++++++++++
+
+  Future<void> deleteData(selectedDocId) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection("users_card")
+          .doc(selectedDocId)
+          .delete()
+          .then((value) {
+        print("Data deleted");
+      });
+    } catch (e) {
+      print(e);
+    }
+    //Delete cart Item--------------------------------------
+  }
 }

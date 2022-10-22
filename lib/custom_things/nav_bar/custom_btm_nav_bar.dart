@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_project/custom_things/custom_txt_style/txt_style.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import '../../screen/card_details.dart';
 import '../../screen/contact_page.dart';
 import '../../screen/home_page.dart';
 import '../../screen/profile/profile_page.dart';
@@ -57,7 +58,9 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
               Stack(
                 children: [
                   Center(
-                    child: IconButton(onPressed: () {},
+                    child: IconButton(onPressed: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context)=>CardDetailsPage()));
+                    },
                       icon: Icon(
                         Icons.shopping_cart, color: Colors.deepOrange,),
                     ),
