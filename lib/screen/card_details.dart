@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_project/custom_things/nav_bar/custom_btm_nav_bar.dart';
 import 'package:firebase_project/helper/firebase_helper.dart';
 import 'package:flutter/material.dart';
@@ -11,8 +12,10 @@ class CardDetailsPage extends StatefulWidget {
 }
 
 class _CardDetailsPageState extends State<CardDetailsPage> {
-  final Stream<QuerySnapshot> cartStream =
-      FirebaseFirestore.instance.collection('users_card').snapshots();
+  final Stream<QuerySnapshot> _cartStream = FirebaseFirestore.instance
+      .collection('users_card')
+      .where("id", isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+      .snapshots();
   int cnt = 1;
   @override
   Widget build(BuildContext context) {
@@ -40,29 +43,26 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
         ),
         body: Container(
           padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-          child: Center(
-            child: StreamBuilder(
-              stream: cartStream,
-              builder: (BuildContext context, AsyncSnapshot snapshot) {
-                if (snapshot.hasError) {
-                  return Text('Something went wrong');
-                }
-                if (!(snapshot.hasData)) {
-                  return Text('Your Cart is Empty Now');
-                }
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Text("Loading");
-                }
-
-                return ListView(
-                  children: snapshot.data!.docs
-                      .map<Widget>((DocumentSnapshot document) {
-                    Map<String, dynamic> data =
-                        document.data()! as Map<String, dynamic>;
+          child: StreamBuilder(
+            stream: _cartStream,
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              if (snapshot.hasError) {
+                return Center(child: Text('Something went wrong'));
+              }
+              else if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(
+                    child: CircularProgressIndicator(color: Color(0xFF006847)));
+              }
+              else if (snapshot.hasData && snapshot.data!.docs.length != 0) {
+                return ListView.separated(
+                  shrinkWrap: true,
+                  itemBuilder: (context, index) {
+                    var _data = snapshot.data!.docs[index];
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        Text("Item${data.length}"),
+                        Text("Item${snapshot.data!.docs.length}"),
                         Container(
                           margin: EdgeInsets.symmetric(vertical: 5),
                           height: 150,
@@ -82,8 +82,8 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
                                     Row(
                                       children: [
                                         Image(
-                                            image:
-                                                NetworkImage('${data['img']}')),
+                                            image: NetworkImage(
+                                                '${_data['img']}')),
                                         Column(
                                           mainAxisAlignment:
                                               MainAxisAlignment.center,
@@ -91,7 +91,7 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              '${data['name']}',
+                                              '${_data['name']}',
                                               style: TextStyle(
                                                   fontSize: 18,
                                                   fontWeight: FontWeight.bold),
@@ -100,7 +100,7 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
                                               height: 5,
                                             ),
                                             Text(
-                                              'TK. ${data['price']}',
+                                              'TK. ${_data['price']}',
                                               style: TextStyle(
                                                   color: Colors.deepOrange),
                                             ),
@@ -110,8 +110,8 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
                                     ),
                                     IconButton(
                                         onPressed: () {
-                                          FireBaseHelper()
-                                              .deleteData(document.id);
+                                          FireBaseHelper().deleteData(
+                                              snapshot.data.docs[index].id);
                                         },
                                         icon: Icon(
                                           Icons.delete,
@@ -191,13 +191,14 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
                                         ),
                                       ],
                                     ),
-                                    Text(
-                                      "${data['price']*cnt}",
-                                      style: TextStyle(
-                                          color: Colors.deepOrange,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500),
-                                    ),
+                                    Text(((int.parse(_data['price'])) * cnt).toString())
+                                    /*Text(
+                                    "TK. " "${_data['price']}",
+                                    style: TextStyle(
+                                        color: Colors.deepOrange,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500),
+                                  ),*/
                                   ],
                                 ),
                               ),
@@ -206,10 +207,22 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
                         ),
                       ],
                     );
-                  }).toList(),
+                  },
+                  separatorBuilder: (context, index) {
+                    return SizedBox(
+                      height: 10,
+                    );
+                  },
+                  itemCount: snapshot.data.docs.length,
                 );
-              },
-            ),
+              }
+              return Center(
+                child: Text(
+                  'Your Cart is Empty Now',
+                  style: TextStyle(fontSize: 20, color: Colors.black),
+                ),
+              );
+            },
           ),
         ),
       ),

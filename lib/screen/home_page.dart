@@ -13,7 +13,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
 
-    final Stream<QuerySnapshot> adminPost = FirebaseFirestore.instance.collection('admin_post').snapshots();
+    final Stream<QuerySnapshot> _adminPost = FirebaseFirestore.instance.collection('admin_post').snapshots();
 
     return Scaffold(
       body: Container(
@@ -22,7 +22,7 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             children: [
               StreamBuilder<QuerySnapshot>(
-                stream: adminPost,
+                stream: _adminPost,
                 builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
                   if (snapshot.hasError) {
                     return Center(child: Text('Something went wrong'));
@@ -42,7 +42,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                       itemCount: snapshot.data!.docs.length,
                       itemBuilder: (BuildContext context, int index) {
-                        var data = snapshot.data!.docs[index];
+                        var _data = snapshot.data!.docs[index];
                         return GestureDetector(
                           onTap: (){
                             Navigator.of(context).push(MaterialPageRoute(builder: (context) {
@@ -59,13 +59,13 @@ class _HomePageState extends State<HomePage> {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                 children: [
-                                  Image(image: NetworkImage(data['img']),
+                                  Image(image: NetworkImage(_data['img']),
                                     height: 100,
                                     width: double.infinity,
                                     fit: BoxFit.cover,
                                   ),
-                                  Text(data['name']),
-                                  Text('Price : '+data['price']),
+                                  Text(_data['name']),
+                                  Text('Price : '+_data['price']),
                                 ],
                               ),
                             ),
