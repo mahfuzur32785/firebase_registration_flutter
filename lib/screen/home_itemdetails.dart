@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'dart:math' as math;
 
-import '../../custom_things/custom_txt_style/txt_style.dart';
-import '../../helper/firebase_helper.dart';
+import '../custom_things/custom_txt_style/txt_style.dart';
+import '../helper/firebase_helper.dart';
 
 class ItemDetails extends StatefulWidget {
   ItemDetails({Key? key, this.index, this.snapshot}) : super(key: key);
@@ -33,7 +33,7 @@ class _ItemDetailsState extends State<ItemDetails> {
         centerTitle: true,
       ),
       body: Container(
-        padding: EdgeInsets.only(left: 10,right: 10,top: 10,bottom: 50),
+        padding: EdgeInsets.only(left: 10,right: 10,top: 10,bottom: 0),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1080,7 +1080,7 @@ class _ItemDetailsState extends State<ItemDetails> {
           ),
         ),
       ),
-      bottomSheet: GestureDetector(
+      bottomNavigationBar: GestureDetector(
         onTap: (){
           Provider.of<FireBaseHelper>(context, listen: false).userOrderCardAdd(
               name: widget.snapshot!.data!.docs[widget.index]['name'],

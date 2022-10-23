@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_project/screen/profile/home_itemdetails.dart';
+import 'package:firebase_project/screen/home_itemdetails.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
