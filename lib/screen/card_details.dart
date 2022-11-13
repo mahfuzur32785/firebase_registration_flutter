@@ -3,11 +3,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_project/custom_things/nav_bar/custom_btm_nav_bar.dart';
 import 'package:firebase_project/helper/firebase_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../custom_things/custom_txt_style/txt_style.dart';
 
+// ignore: must_be_immutable
 class CardDetailsPage extends StatefulWidget {
-  CardDetailsPage({Key? key}) : super(key: key);
+  const CardDetailsPage({Key? key}) : super(key: key);
+
 
   @override
   State<CardDetailsPage> createState() => _CardDetailsPageState();
@@ -18,9 +21,11 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
       .collection('users_card')
       .where("id", isEqualTo: FirebaseAuth.instance.currentUser!.uid)
       .snapshots();
+
   int cnt = 1;
   int shipingCost = 240;
   bool isChecked = true;
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -31,10 +36,10 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
       child: Scaffold(
         appBar: AppBar(
           toolbarHeight: 70,
-          backgroundColor: Color(0xFFFFFFFF),
+          backgroundColor: const Color(0xFFFFFFFF),
           foregroundColor: Colors.black,
           elevation: 0,
-          title: Text('My Cart'),
+          title: const Text('My Cart'),
           leading: IconButton(
             onPressed: () {
               Navigator.push(
@@ -42,37 +47,43 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
                   MaterialPageRoute(
                       builder: (context) => CustomBottomNavBar()));
             },
-            icon: Icon(Icons.arrow_back),
+            icon: const Icon(Icons.arrow_back),
           ),
         ),
         body: Container(
-          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
           child: StreamBuilder(
             stream: _cartStream,
             builder: (BuildContext context, AsyncSnapshot snapshot) {
               if (snapshot.hasError) {
-                return Center(child: Text('Something went wrong'));
+                return const Center(child: Text('Something went wrong'));
               } else if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(
+                return const Center(
                     child: CircularProgressIndicator(color: Color(0xFF006847)));
               } else if (snapshot.hasData && snapshot.data!.docs.length != 0) {
+
+                var subTotal = 0;
+                snapshot.data.docs.forEach((result) {
+                  subTotal += int.parse(result.data()['price']);
+                });
+
                 return SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       ListView.separated(
                         shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: snapshot.data.docs.length,
                         itemBuilder: (context, index) {
                           var data = snapshot.data!.docs[index];
-                          // int cnt = 1;
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
-                              Text("Item${index+1}"),
+                              Text("Item ${subTotal}"),
                               Container(
-                                margin: EdgeInsets.symmetric(vertical: 5),
+                                margin: const EdgeInsets.symmetric(vertical: 5),
                                 height: 150,
                                 width: double.infinity,
                                 decoration: BoxDecoration(
@@ -99,16 +110,16 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
                                                 children: [
                                                   Text(
                                                     snapshot.data!.docs[index]['name'],
-                                                    style: TextStyle(
+                                                    style: const TextStyle(
                                                         fontSize: 18,
                                                         fontWeight: FontWeight.bold),
                                                   ),
-                                                  SizedBox(
+                                                  const SizedBox(
                                                     height: 5,
                                                   ),
                                                   Text(
                                                     'TK. ${snapshot.data!.docs[index]['price']}',
-                                                    style: TextStyle(
+                                                    style: const TextStyle(
                                                         color: Colors.deepOrange),
                                                   ),
                                                 ],
@@ -120,7 +131,7 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
                                                 FireBaseHelper().deleteData(
                                                     snapshot.data.docs[index].id);
                                               },
-                                              icon: Icon(
+                                              icon: const Icon(
                                                 Icons.delete,
                                                 color: Colors.red,
                                                 size: 30,
@@ -136,7 +147,7 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
                                         children: [
                                           Row(
                                             children: [
-                                              GestureDetector(
+                                              /*GestureDetector(
                                                 onTap: () {
                                                   print('click komce');
                                                   if (cnt <= 1) {
@@ -197,13 +208,14 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
                                                           fontSize: 20,
                                                           color: Color(0xFF006847))),
                                                 ),
-                                              ),
+                                              ),*/
+                                              Text("Quantity: $cnt")
                                             ],
                                           ),
                                           Text(
-                                            "TK. ${((int.parse(data['price'])) * cnt)}"
+                                            "TK. ${((int.parse(data['price'])))}"
                                                 .toString(),
-                                            style: TextStyle(
+                                            style: const TextStyle(
                                                 color: Colors.deepOrange,
                                                 fontSize: 16,
                                                 fontWeight: FontWeight.w500),
@@ -218,15 +230,14 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
                           );
                         },
                         separatorBuilder: (context, index) {
-                          return SizedBox(
+                          return const SizedBox(
                             height: 10,
                           );
                         },
-                        itemCount: snapshot.data.docs.length,
                       ),
                       Container(
-                        padding: EdgeInsets.symmetric(horizontal: 30,vertical: 0),
-                        margin: EdgeInsets.symmetric(vertical: 10),
+                        padding: const EdgeInsets.symmetric(horizontal: 30,vertical: 0),
+                        margin: const EdgeInsets.symmetric(vertical: 10),
                         height: 120,
                         width: double.infinity,
                         color: Colors.white,
@@ -236,16 +247,16 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text("Sub Total",style: TextStyle(
+                                const Text("Sub Total",style: TextStyle(
                                   fontSize: 16,
                                 ),),
-                                Text("data"),
+                                Text("TK. ${subTotal}"),
                               ],
                             ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text("Shipping Cost",style: TextStyle(
+                                const Text("Shipping Cost",style: TextStyle(
                                   fontSize: 16,
                                 ),),
                                 Text("TK. ${shipingCost}"),
@@ -254,11 +265,11 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text("Grand Total",style: TextStyle(
+                                const Text("Grand Total",style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold
                                 ),),
-                                Text("TK. ${shipingCost}",style: TextStyle(
+                                Text("TK. ${subTotal+shipingCost}",style: const TextStyle(
                                   color: Colors.red,fontSize: 16,fontWeight: FontWeight.w500
                                 ),),
                               ],
@@ -267,7 +278,7 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
                         ),
                       ),
                       Container(
-                        padding: EdgeInsets.symmetric(horizontal: 0,vertical: 5),
+                        padding: const EdgeInsets.symmetric(horizontal: 0,vertical: 5),
                         height: 100,
                         width: double.infinity,
                         color: Colors.white,
@@ -275,13 +286,13 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text('Payment Method:',style: TextStyle(
+                            const Text('Payment Method:',style: TextStyle(
                               fontSize: 16,fontWeight: FontWeight.bold
                             ),),
                             Row(
                               children: [
                                 Checkbox(
-                                  activeColor: Color(0xFF006847),
+                                  activeColor: const Color(0xFF006847),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(20)
                                   ),
@@ -290,7 +301,7 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
                                     isChecked = !isChecked;
                                   });
                                 },),
-                                Text("Cash on delivery",style: TextStyle(
+                                const Text("Cash on delivery",style: TextStyle(
                                     fontSize: 12,fontWeight: FontWeight.w500,color: Colors.deepOrange
                                 )),
                               ],
@@ -302,7 +313,7 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
                   ),
                 );
               }
-              return Center(
+              return const Center(
                 child: Text(
                   'Your Cart is Empty Now',
                   style: TextStyle(fontSize: 20, color: Colors.black),
@@ -311,17 +322,28 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
             },
           ),
         ),
-        bottomNavigationBar: Container(
-          height: 50,
-          width: double.maxFinite,
-          alignment: Alignment.center,
-          color: Color(0xFF006847),
-          child: Text(
-            'Place Order',
-            style: myStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 16
+
+        bottomNavigationBar: GestureDetector(
+          onTap: (){
+            Provider.of<FireBaseHelper>(context, listen: false).confirmUsersOrder(
+                name: _cartStream,
+
+                quantity: cnt,
+                context: context
+            );
+          },
+          child: Container(
+            height: 50,
+            width: double.maxFinite,
+            alignment: Alignment.center,
+            color: const Color(0xFF006847),
+            child: Text(
+              'Place Order',
+              style: myStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16
+              ),
             ),
           ),
         ),

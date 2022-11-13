@@ -42,7 +42,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                       itemCount: snapshot.data!.docs.length,
                       itemBuilder: (BuildContext context, int index) {
-                        var _data = snapshot.data!.docs[index];
+                        var data = snapshot.data!.docs[index];
                         return GestureDetector(
                           onTap: (){
                             Navigator.of(context).push(MaterialPageRoute(builder: (context) {
@@ -59,13 +59,13 @@ class _HomePageState extends State<HomePage> {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                 children: [
-                                  Image(image: NetworkImage(_data['img']),
+                                  Image(image: NetworkImage(data['img']),
                                     height: 100,
                                     width: double.infinity,
                                     fit: BoxFit.cover,
                                   ),
-                                  Text(_data['name']),
-                                  Text('Price : '+_data['price']),
+                                  Text(data['name']),
+                                  Text('Price : '+data['price']),
                                 ],
                               ),
                             ),

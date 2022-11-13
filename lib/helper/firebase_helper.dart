@@ -16,7 +16,7 @@ class FireBaseHelper with ChangeNotifier {
   bool adminSignInLoading = false;
   bool addBikeDalaLoading = false;
   bool userCardLoading = false;
-
+  bool userOrderLoading = false;
   //FOR SIGNUP ++++++++++++++++++++++++++++++++
   Future<void> createUser({user_name, user_email, user_pass, context}) async {
     signUpLoading = true;
@@ -618,5 +618,22 @@ class FireBaseHelper with ChangeNotifier {
       print(e);
     }
     //Delete cart Item--------------------------------------
+  }
+
+  confirmUsersOrder({name, img, price, quantity, payment_methode, context}){
+    userOrderLoading = true;
+    notifyListeners();
+
+    CollectionReference users_order =
+    FirebaseFirestore.instance.collection('users_order');
+    final getId = FirebaseAuth.instance.currentUser!.uid;
+
+    return users_order.add(
+        {'name': name, 'price': price, 'quantity': quantity, 'img': img,'payment':payment_methode, 'id': getId}).then((value) {
+      userOrderLoading = false;
+      notifyListeners();
+      print('User Order Confirm');
+      userCardADDSuccessfulMassege(context);
+    });
   }
 }

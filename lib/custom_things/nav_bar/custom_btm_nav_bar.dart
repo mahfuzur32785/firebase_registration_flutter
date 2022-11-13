@@ -107,6 +107,7 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
               MyNavbarItem(icon: Icons.contact_page, title: 'Contact'),
               MyNavbarItem(icon: Icons.person, title: 'Profile'),
             ],
+            iconSize: 20,
             backgroundColor: Colors.white,
             elevation: 50,
             selectedBackgroundColor: Color(0xFF006847),
@@ -124,7 +125,7 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
         builder: (BuildContext context) {
           return AlertDialog(
             content: Container(
-              height: MediaQuery.of(context).size.height*0.25,
+              height: 200,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
