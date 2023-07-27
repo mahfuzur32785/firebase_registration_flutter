@@ -80,7 +80,7 @@ class _MyNavBarState extends State<MyNavBar> {
             padding: widget.margin!,
             child: Container(
               padding: widget.padding,
-              height: MediaQuery.of(context).size.height*0.085,
+              height: MediaQuery.of(context).size.height* 0.1,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(widget.borderRadius!),
                 color: widget.backgroundColor,

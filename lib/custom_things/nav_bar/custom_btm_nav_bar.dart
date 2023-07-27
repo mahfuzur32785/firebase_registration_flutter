@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_project/custom_things/custom_txt_style/txt_style.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../../screen/card_details.dart';
 import '../../screen/contact_page.dart';
@@ -68,8 +67,8 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
                   Positioned(
                     top: 10,
                     right: 10,
-                    child: Text('${docs.length}', style: myStyle(
-                      color: Colors.red,
+                    child: Text('${docs.length}', style: TextStyle(
+                      color: Colors.red
                     ),),
                   ),
                 ],
